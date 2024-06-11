@@ -34,7 +34,11 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 vim.keymap.set("i", "<C-BS>", "<C-W>", { silent = true, noremap = true })
 vim.keymap.set("i", "<C-Del>", "<C-o>dw", { silent = true, noremap = true })
 
-vim.keymap.set("t", "<F2>", "<C-\\><C-n>:FloatermToggle<CR>", { desc = "Exit terminal mode" })
+
+vim.keymap.set("n", "<F1>", "<Esc><Esc>:FloatermToggle primary<CR>")
+vim.keymap.set("t", "<F1>", "<C-\\><C-n>:FloatermToggle primary<CR>")
+vim.keymap.set("n", "<F2>", "<Esc><Esc>:FloatermToggle git<CR>")
+vim.keymap.set("t", "<F2>", "<C-\\><C-n>:FloatermToggle git<CR>", { desc = "Exit terminal mode" })
 
 vim.keymap.set("n", "<leader>g", "<Esc><Esc>:FloatermToggle git<CR>", { desc = "Toggle lazygit terminal" })
 vim.keymap.set("n", "<leader>v", "<Esc><Esc>:FloatermToggle term<CR>", { desc = "Toggle general terminal" })
