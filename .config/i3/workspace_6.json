@@ -1,0 +1,48 @@
+{
+    "border": "none",
+    "current_border_width": 3,
+    "floating": "auto_off",
+    "geometry": {
+       "height": 996,
+       "width": 616,
+       "x": 4492,
+       "y": 30
+    },
+    "marks": [],
+    "name": "Junes + 2 Chats",
+    "percent": 0.5,
+    "swallows": [
+       {
+       "class": "^steam$",
+       "instance": "^steamwebhelper$",
+       "machine": "^STG\\-PC$",
+       "title": "^Junes\\ \\+\\ 2\\ Chats$"
+       }
+    ],
+    "type": "con"
+}
+
+{
+    "border": "none",
+    "current_border_width": 3,
+    "floating": "auto_off",
+    "geometry": {
+       "height": 996,
+       "width": 1010,
+       "x": 3870,
+       "y": 30
+    },
+    "marks": [],
+    "name": "Steam",
+    "percent": 0.5,
+    "swallows": [
+       {
+       "class": "^steam$",
+       "instance": "^steamwebhelper$",
+       "machine": "^STG\\-PC$",
+       "title": "^Steam$"
+       }
+    ],
+    "type": "con"
+}
+

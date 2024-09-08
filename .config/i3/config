@@ -66,6 +66,7 @@ bindsym $mod+d exec --no-startup-id dmenu_run
 # bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
 
 bindsym Print exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
+bindsym $mod+Print exec --no-startup-id maim -i $(xdotool getactivewindow) | xclip -selection clipboard -t image/png
 
 # change focus
 bindsym $mod+j focus left
@@ -169,21 +170,21 @@ bindsym $mod+Ctrl+Shift+3 move container to workspace number $ws13
 bindsym $mod+Ctrl+Shift+4 move container to workspace number $ws14
 bindsym $mod+Ctrl+Shift+5 move container to workspace number $ws15
 
-workspace $ws1 output DP-1
-workspace $ws2 output DP-1
-workspace $ws3 output DP-1
-workspace $ws11 output DP-1
-workspace $ws12 output DP-1
-workspace $ws13 output DP-1
-workspace $ws4 output DP-3
-workspace $ws5 output DP-3
-workspace $ws6 output DP-3
-workspace $ws7 output DP-3
-workspace $ws14 output DP-3
-workspace $ws15 output DP-3
-workspace $ws8 output HDMI-A-1
-workspace $ws9 output HDMI-A-1
-workspace $ws0 output HDMI-A-1
+workspace $ws1 output DisplayPort-0
+workspace $ws2 output DisplayPort-0
+workspace $ws3 output DisplayPort-0
+workspace $ws11 output DisplayPort-0
+workspace $ws12 output DisplayPort-0
+workspace $ws13 output DisplayPort-0
+workspace $ws4 output DisplayPort-2
+workspace $ws5 output DisplayPort-2
+workspace $ws6 output DisplayPort-2
+workspace $ws7 output DisplayPort-2
+workspace $ws14 output DisplayPort-2
+workspace $ws15 output DisplayPort-2
+workspace $ws8 output HDMI-A-0
+workspace $ws9 output HDMI-A-0
+workspace $ws0 output HDMI-A-0
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -217,11 +218,11 @@ mode "resize" {
         bindsym $mod+r mode "default"
 }
 
-client.focused          #d16ba3 #d16ba3 #ffffff #d16ba3 #d16ba3
-client.focused_inactive #d16ba3 #d16ba3 #ffffff #d16ba3 #d16ba3
-client.unfocused        #d16ba3 #d16ba3 #ffffff #d16ba3 #d16ba3
-client.urgent           #d16ba3 #d16ba3 #ffffff #d16ba3 #d16ba3
-client.placeholder      #d16ba3 #d16ba3 #ffffff #d16ba3 #d16ba3
+client.focused          #5cc3ff #5cc3ff #ffffff #5cc3ff #5cc3ff
+client.focused_inactive #5cc3ff #5cc3ff #ffffff #5cc3ff #5cc3ff
+client.unfocused        #5cc3ff #5cc3ff #ffffff #5cc3ff #5cc3ff
+client.urgent           #5cc3ff #5cc3ff #ffffff #5cc3ff #5cc3ff
+client.placeholder      #5cc3ff #5cc3ff #ffffff #5cc3ff #5cc3ff
 
 client.background       #ffffff
 
@@ -237,3 +238,13 @@ default_border pixel 3
 default_floating_border pixel 1
 
 for_window [class="Video Game"] floating enable
+
+
+exec --no-startup-id "i3-msg '--no-auto-back-and-forth 4; append_layout ~/.config/i3/workspace_4.json'"
+exec --no-startup-id "i3-msg '--no-auto-back-and-forth 5; append_layout ~/.config/i3/workspace_5.json'"
+exec --no-startup-id "i3-msg '--no-auto-back-and-forth 6; append_layout ~/.config/i3/workspace_6.json'"
+exec --no-startup-id "i3-msg '--no-auto-back-and-forth 7; append_layout ~/.config/i3/workspace_7.json'"
+exec --no-startup-id "i3-msg '--no-auto-back-and-forth 11; append_layout ~/.config/i3/workspace_11.json'"
+exec --no-startup-id "i3-msg '--no-auto-back-and-forth 12; append_layout ~/.config/i3/workspace_12.json'"
+
+exec feh --bg-scale ~/niyerniyer.jpeg ~/niyerniyer.jpeg ~/niyerniyer.jpeg

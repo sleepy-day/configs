@@ -1,0 +1,25 @@
+{
+    "border": "pixel",
+    "current_border_width": 3,
+    "floating": "auto_off",
+    "geometry": {
+       "height": 990,
+       "width": 1854,
+       "x": 3873,
+       "y": 33
+    },
+    "marks": [],
+    "name": "#googie-channel | mongoloid support group - Discord",
+    "percent": 1,
+    "swallows": [
+       {
+       "class": "^discord$",
+       "instance": "^discord$",
+       "machine": "^STG\\-PC$",
+       "title": "^\\#googie\\-channel\\ \\|\\ mongoloid\\ support\\ group\\ \\-\\ Discord$",
+       "window_role": "^browser\\-window$"
+       }
+    ],
+    "type": "con"
+}
+

@@ -5,6 +5,10 @@ export PATH=$HOME/miniconda3/bin:$PATH
 export PATH=$HOME/zig:$PATH
 export PATH=$HOME/zls/zig-out/bin:$PATH
 export PATH=$HOME/ols:$PATH
+export PATH=$HOME/.cargo/bin:$PATH
+export PATH=$HOME/go/bin:$PATH
+export PATH=$HOME/ww2ogg/ww2ogg:$PATH
+export PATH=$HOME/.dotnet/tools:$PATH
 export MAKEFLAGS="-j14"
 source ~/.bash_profile
 
@@ -135,3 +139,10 @@ unset __conda_setup
 
 # Created by `pipx` on 2024-05-17 10:07:05
 export PATH="$PATH:/home/sterence/.local/bin"
+
+# bun completions
+[ -s "/home/sterence/.bun/_bun" ] && source "/home/sterence/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

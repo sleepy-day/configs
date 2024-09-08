@@ -3,6 +3,7 @@ vim.g.maplocalleader = " "
 vim.g.have_nerd_font = false
 vim.g.loaded_matchparen = 1
 vim.opt.number = true
+vim.opt.relativenumber = true
 vim.opt.showmode = false
 vim.opt.clipboard = "unnamedplus"
 vim.opt.breakindent = true
@@ -11,7 +12,6 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 200
--- Mapped sequence wait time
 vim.opt.timeoutlen = 300
 vim.opt.splitright = true
 vim.opt.splitbelow = true
@@ -19,7 +19,6 @@ vim.opt.inccommand = "split"
 vim.opt.cursorline = true
 vim.opt.scrolloff = 8
 vim.opt.hlsearch = true
-
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
@@ -34,11 +33,16 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 vim.keymap.set("i", "<C-BS>", "<C-W>", { silent = true, noremap = true })
 vim.keymap.set("i", "<C-Del>", "<C-o>dw", { silent = true, noremap = true })
 
-
 vim.keymap.set("n", "<F1>", "<Esc><Esc>:FloatermToggle primary<CR>")
 vim.keymap.set("t", "<F1>", "<C-\\><C-n>:FloatermToggle primary<CR>")
+vim.keymap.set("i", "<F1>", "<C-\\><C-n>:FloatermToggle primary<CR>")
 vim.keymap.set("n", "<F2>", "<Esc><Esc>:FloatermToggle git<CR>")
 vim.keymap.set("t", "<F2>", "<C-\\><C-n>:FloatermToggle git<CR>", { desc = "Exit terminal mode" })
+vim.keymap.set("i", "<F2>", "<C-\\><C-n>:FloatermToggle git<CR>", { desc = "Exit terminal mode" })
+
+vim.keymap.set("n", "o", "ox<BS>", { silent = true, noremap = true })
+vim.keymap.set("n", "O", "Ox<BS>", { silent = true, noremap = true })
+vim.keymap.set("i", "<CR>", "<CR>x")
 
 vim.keymap.set("n", "<leader>g", "<Esc><Esc>:FloatermToggle git<CR>", { desc = "Toggle lazygit terminal" })
 vim.keymap.set("n", "<leader>v", "<Esc><Esc>:FloatermToggle term<CR>", { desc = "Toggle general terminal" })
@@ -58,6 +62,8 @@ vim.keymap.set("v", "<C-Up>", ":m '<-2<CR>gv=gv")
 
 vim.keymap.set("n", "J", "mzJ`z")
 
+vim.keymap.set("i", "<S-Left>", "<C-o>ge<Esc>li")
+
 vim.keymap.set("x", "p", "\"_dP")
 vim.keymap.set("n", "d", "\"_d")
 vim.keymap.set("v", "d", "\"_d")
@@ -66,6 +72,8 @@ vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
 vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
 vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
+
+vim.keymap.set("v", "y", "ygv")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
@@ -87,10 +95,9 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 	{
-		"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+		"tpope/vim-sleuth",
 	},
 
-	-- "gc" to comment visual regions/lines
 	{ "numToStr/Comment.nvim", opts = {} },
 
 	{
@@ -126,13 +133,13 @@ require("lazy").setup({
 		end,
 	},
 
-	{ -- Fuzzy Finder (files, lsp, etc)
+	{
 		"nvim-telescope/telescope.nvim",
 		event = "VimEnter",
 		branch = "0.1.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			{ -- If encountering errors, see telescope-fzf-native README for installation instructions
+			{
 				"nvim-telescope/telescope-fzf-native.nvim",
 
 				build = "make",
@@ -151,6 +158,27 @@ require("lazy").setup({
 					file_ignore_patterns = {
 						"build",
 						"zig-cache"
+					},
+					vimgrep_arguments = {
+						"rg",
+						"--color=never",
+						"--no-heading",
+						"--with-filename",
+						"--line-number",
+						"--column",
+						"--smart-case",
+						"--auto-hybrid-regex"
+					},
+				},
+				pickers = {
+					find_files = {
+						find_command = {
+							"rg",
+							"--files",
+							"--no-ignore-vcs",
+							"--hidden",
+							"--follow"
+						}
 					},
 				},
 				extensions = {
@@ -175,39 +203,28 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>f.", builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
 			vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
 
-			-- Slightly advanced example of overriding default behavior and theme
 			vim.keymap.set("n", "<leader>/", function()
-				-- You can pass additional configuration to Telescope to change the theme, layout, etc.
 				builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
 					winblend = 10,
 					previewer = false,
 				}))
 			end, { desc = "[/] Fuzzily search in current buffer" })
-
-			-- It's also possible to pass additional configuration options.
-			--  See `:help telescope.builtin.live_grep()` for information about particular keys
 			vim.keymap.set("n", "<leader>f/", function()
 				builtin.live_grep({
 					grep_open_files = true,
 					prompt_title = "Live Grep in Open Files",
 				})
 			end, { desc = "[F]ind [/] in Open Files" })
-
-			-- Shortcut for searching your Neovim configuration files
 			vim.keymap.set("n", "<leader>fn", function()
 				builtin.find_files({ cwd = vim.fn.stdpath("config") })
 			end, { desc = "[F]ind [N]eovim files" })
 		end,
 	},
 
-	{ -- LSP Configuration & Plugins
+	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
-			-- Useful status updates for LSP.
 			{ "j-hui/fidget.nvim", opts = {} },
-
-			-- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-			-- used for completion, annotations and signatures of Neovim apis
 			{ "folke/neodev.nvim", opts = {} },
 		},
 		config = function()
@@ -276,7 +293,6 @@ require("lazy").setup({
 				clangd = {},
 				gopls = {},
 				ols = {},
-				csharp_ls = {},
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -289,11 +305,13 @@ require("lazy").setup({
 						},
 					},
 				},
+				tsserver = {},
+				eslint = {},
 			}
 
 			local ensure_installed = vim.tbl_keys(servers or {})
 			vim.list_extend(ensure_installed, {
-				"stylua", -- Used to format Lua code
+				"stylua",
 			})
 		end,
 	},
@@ -312,11 +330,8 @@ require("lazy").setup({
 			},
 		},
 		opts = {
-			notify_on_error = false,
+			notify_on_error = true,
 			format_on_save = function(bufnr)
-				-- Disable "format_on_save lsp_fallback" for languages that don't
-				-- have a well standardized coding style. You can add additional
-				-- languages here or re-enable it for the disabled ones.
 				local disable_filetypes = { c = true, cpp = true }
 				return {
 					timeout_ms = 500,
@@ -325,12 +340,7 @@ require("lazy").setup({
 			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
-				-- Conform can also run multiple formatters sequentially
-				-- python = { "isort", "black" },
-				--
-				-- You can use a sub-list to tell conform to run *until* a formatter
-				-- is found.
-				-- javascript = { { "prettierd", "prettier" } },
+				template = { "djlint" },
 			},
 		},
 	},
@@ -343,24 +353,12 @@ require("lazy").setup({
 			{
 				"L3MON4D3/LuaSnip",
 				build = (function()
-					-- Build Step is needed for regex support in snippets.
-					-- This step is not supported in many windows environments.
-					-- Remove the below condition to re-enable on windows.
 					if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
 						return
 					end
 					return "make install_jsregexp"
 				end)(),
 				dependencies = {
-					-- `friendly-snippets` contains a variety of premade snippets.
-					--    See the README about individual language/framework/plugin snippets:
-					--    https://github.com/rafamadriz/friendly-snippets
-					-- {
-					--   'rafamadriz/friendly-snippets',
-					--   config = function()
-					--     require('luasnip.loaders.from_vscode').lazy_load()
-					--   end,
-					-- },
 				},
 			},
 			"saadparwaiz1/cmp_luasnip",
@@ -386,15 +384,8 @@ require("lazy").setup({
 					auto_hide = true,
 					show_on_cursor_update = true,
 				},
-				experimental = {
-					ghost_text = true,
-				},
 				preselect = cmp.PreselectMode.None,
 
-				-- For an understanding of why these mappings were
-				-- chosen, you will need to read `:help ins-completion`
-				--
-				-- No, but seriously. Please read `:help ins-completion`, it is really good!
 				mapping = cmp.mapping.preset.insert({
 
 					["<C-b>"] = cmp.mapping.scroll_docs(-4),
@@ -408,9 +399,6 @@ require("lazy").setup({
 
 					["<Up>"] = cmp.config.disable,
 					["<Down>"] = cmp.config.disable,
-
-					-- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-					--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
 				}),
 				sources = {
 					{ name = "nvim_lsp" },
@@ -421,27 +409,15 @@ require("lazy").setup({
 		end,
 	},
 
-	{ -- You can easily change to a different colorscheme.
-		-- Change the name of the colorscheme plugin below, and then
-		-- change the command in the config to whatever the name of that colorscheme is.
-		--
-		-- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+	{
 		"catppuccin/nvim",
 		name = "catppuccin",
-		priority = 1000, -- Make sure to load this before all the other start plugins.
+		priority = 1000,
 		init = function()
 			require("catppuccin").setup({
 				flavour = "frappe",
 			})
-
-			--require("onedarkpro").setup({
-			--	colors = { -- #ccdcde #dfe6ed edecdd
-			--		onelight = { bg = "#cccbbe" },
-			--	},
-			--})
 			vim.cmd.colorscheme("catppuccin")
-
-			-- You can configure highlights by doing something like:
 			vim.cmd.hi("Comment gui=none")
 		end,
 	},
@@ -483,13 +459,9 @@ require("lazy").setup({
 				"zig",
 				"cpp",
 			},
-			-- Autoinstall languages that are not installed
 			auto_install = true,
 			highlight = {
 				enable = true,
-				-- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-				--  If you are experiencing weird indenting issues, add the language to
-				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
 				additional_vim_regex_highlighting = { "ruby", "cpp" },
 			},
 			indent = { enable = true, disable = { "ruby" } },
@@ -498,9 +470,6 @@ require("lazy").setup({
 			},
 		},
 		config = function(_, opts)
-			-- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
-			-- Prefer git instead of curl in order to improve connectivity in some environments
 			require("nvim-treesitter.install").prefer_git = true
 			---@diagnostic disable-next-line: missing-fields
 			require("nvim-treesitter.configs").setup(opts)
@@ -621,6 +590,27 @@ require("lazy").setup({
 
 	{
 		"mbbill/undotree"
+	},
+
+	{
+		"norcalli/nvim-colorizer.lua",
+		opts = {},
+	},
+
+	{
+		"tpope/vim-abolish"
+	},
+
+	{
+		"joerdav/templ.vim"
+	},
+
+	{
+		"jasonwoodland/vim-html-indent"
+	},
+
+	{
+		"rktjmp/lush.nvim"
 	}
 })
 
@@ -647,11 +637,41 @@ require 'lspconfig'.zls.setup {}
 require 'lspconfig'.gopls.setup {}
 require 'lspconfig'.clangd.setup {}
 require 'lspconfig'.ols.setup {}
-require 'lspconfig'.csharp_ls.setup {}
-require 'lspconfig'.lua_ls.setup {}
+require 'neodev'.setup({
+	override = function(root_dir, library)
+		if root_dir:find("home/sterence/.config/nvim", 1, true) == 1 then
+			library.enabled = true
+			library.plugins = true
+			library.types = true
+			library.runtime = true
+		end
+	end,
+})
+require 'lspconfig'.lua_ls.setup {
+	settings = {
+		lua = {
+			completion = {
+				callSnippet = "Replace"
+			}
+		}
+	}
+}
+require 'lspconfig'.tsserver.setup {}
+require 'lspconfig'.eslint.setup {}
+require 'lspconfig'.html.setup {}
+require 'lspconfig'.htmx.setup {}
+require 'lspconfig'.csharp_ls.setup {
+	lsp = {
+		format_on_save = false,
+	}
+}
 require 'lspconfig'.glslls.setup {
 	cmd = { "glslls", "--stdin", "--target-env=opengl4.5" }
 }
+
+vim.diagnostic.enable(false, nil)
+
+require 'colorizer'.setup {}
 
 vim.treesitter.language.register("glsl", "vert")
 vim.treesitter.language.register("glsl", "tesc")
@@ -665,3 +685,14 @@ vim.keymap.set("n", "<leader>di", "<Plug>VimspectorBalloonEval", { desc = "Inspe
 vim.keymap.set("x", "<leader>di", "<Plug>VimspectorBalloonEval", { desc = "Inspect in debug mode." })
 
 vim.keymap.set("n", "<leader><F5>", vim.cmd.UndotreeToggle)
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "go",
+	command = "setlocal indentkeys-=:"
+})
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "go",
+	command = "setlocal indentkeys-=<:>"
+})
+
+vim.filetype.add({ extension = { templ = "templ" } })
