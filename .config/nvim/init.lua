@@ -2,6 +2,8 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.g.have_nerd_font = false
 vim.g.loaded_matchparen = 1
+vim.g.OmniSharp_server_use_net6 = 1
+vim.g.OmniSharp_highlighting = 0
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.showmode = false
@@ -17,12 +19,12 @@ vim.opt.splitright = true
 vim.opt.splitbelow = true
 vim.opt.inccommand = "split"
 vim.opt.cursorline = true
-vim.opt.scrolloff = 8
+vim.opt.scrolloff = 4
 vim.opt.hlsearch = true
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
-vim.bo.softtabstop = 4
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.bo.softtabstop = 2
+vim.opt.smartindent = false
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
@@ -93,45 +95,7 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
-	{
-		"tpope/vim-sleuth",
-	},
-
-	{ "numToStr/Comment.nvim", opts = {} },
-
-	{
-		"lewis6991/gitsigns.nvim",
-		opts = {
-			signs = {
-				add = { text = "+" },
-				change = { text = "~" },
-				delete = { text = "_" },
-				topdelete = { text = "__" },
-				changedelete = { text = "~" },
-			},
-		},
-	},
-
-	{
-		"folke/which-key.nvim",
-		event = "VimEnter",
-		config = function()
-			require("which-key").setup()
-
-			require("which-key").register({
-				["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-				["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
-				["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-				["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
-			})
-
-			require("which-key").register({
-				["<leader>h"] = { "Git [H]unk" },
-			}, { mode = "v" })
-		end,
-	},
+plugins = {
 
 	{
 		"nvim-telescope/telescope.nvim",
@@ -156,8 +120,7 @@ require("lazy").setup({
 			require("telescope").setup({
 				defaults = {
 					file_ignore_patterns = {
-						"build",
-						"zig-cache"
+
 					},
 					vimgrep_arguments = {
 						"rg",
@@ -223,10 +186,6 @@ require("lazy").setup({
 
 	{
 		"neovim/nvim-lspconfig",
-		dependencies = {
-			{ "j-hui/fidget.nvim", opts = {} },
-			{ "folke/neodev.nvim", opts = {} },
-		},
 		config = function()
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
@@ -260,39 +219,14 @@ require("lazy").setup({
 					map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 
 					local client = vim.lsp.get_client_by_id(event.data.client_id)
-					if client and client.server_capabilities.documentHighlightProvider then
-						local highlight_augroup =
-							vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
-						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-							buffer = event.buf,
-							group = highlight_augroup,
-							callback = vim.lsp.buf.document_highlight,
-						})
-
-						vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-							buffer = event.buf,
-							group = highlight_augroup,
-							callback = vim.lsp.buf.clear_references,
-						})
-
-						vim.api.nvim_create_autocmd("LspDetach", {
-							group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
-							callback = function(event2)
-								vim.lsp.buf.clear_references()
-								vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event2.buf })
-							end,
-						})
-					end
 				end,
 			})
 
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+			-- capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
 			local servers = {
-				clangd = {},
 				gopls = {},
-				ols = {},
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -312,99 +246,6 @@ require("lazy").setup({
 			local ensure_installed = vim.tbl_keys(servers or {})
 			vim.list_extend(ensure_installed, {
 				"stylua",
-			})
-		end,
-	},
-
-	{
-		"stevearc/conform.nvim",
-		lazy = false,
-		keys = {
-			{
-				"<leader>F",
-				function()
-					require("conform").format({ async = true, lsp_fallback = true })
-				end,
-				mode = "",
-				desc = "[F]ormat buffer",
-			},
-		},
-		opts = {
-			notify_on_error = true,
-			format_on_save = function(bufnr)
-				local disable_filetypes = { c = true, cpp = true }
-				return {
-					timeout_ms = 500,
-					lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-				}
-			end,
-			formatters_by_ft = {
-				lua = { "stylua" },
-				template = { "djlint" },
-			},
-		},
-	},
-
-	{ -- Autocompletion
-		"Sam-programs/nvim-cmp",
-		event = "InsertEnter",
-		branch = "toggle_completion_menu",
-		dependencies = {
-			{
-				"L3MON4D3/LuaSnip",
-				build = (function()
-					if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
-						return
-					end
-					return "make install_jsregexp"
-				end)(),
-				dependencies = {
-				},
-			},
-			"saadparwaiz1/cmp_luasnip",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-path",
-		},
-		config = function()
-			-- See `:help cmp`
-			local cmp = require("cmp")
-			local luasnip = require("luasnip")
-			luasnip.config.setup({})
-
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
-				},
-				completion = {
-					completeopt = "menu,menuone,noinsert",
-				},
-				window = {
-					auto_hide = true,
-					show_on_cursor_update = true,
-				},
-				preselect = cmp.PreselectMode.None,
-
-				mapping = cmp.mapping.preset.insert({
-
-					["<C-b>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-
-					["<C-Return>"] = cmp.mapping.confirm({ select = true }),
-					["<C-Down>"] = cmp.mapping.select_next_item(),
-					["<C-Up>"] = cmp.mapping.select_prev_item(),
-
-					["<C-Space>"] = cmp.mapping.complete({}),
-
-					["<Up>"] = cmp.config.disable,
-					["<Down>"] = cmp.config.disable,
-				}),
-				sources = {
-					{ name = "nvim_lsp" },
-					{ name = "luasnip" },
-					{ name = "path" },
-				},
 			})
 		end,
 	},
@@ -455,14 +296,18 @@ require("lazy").setup({
 				"vimdoc",
 				"odin",
 				"go",
-				"c_sharp",
 				"zig",
 				"cpp",
 			},
 			auto_install = true,
 			highlight = {
 				enable = true,
-				additional_vim_regex_highlighting = { "ruby", "cpp" },
+				additional_vim_regex_highlighting = false,
+			},
+			refactor = {
+				highlight_definitions = false,
+				highlight_current_scope = false,
+				smart_rename = false,
 			},
 			indent = { enable = true, disable = { "ruby" } },
 			matchup = {
@@ -477,79 +322,6 @@ require("lazy").setup({
 	},
 
 	{
-		"theprimeagen/harpoon",
-		branch = "harpoon2",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		config = function()
-			require("harpoon"):setup()
-		end,
-		keys = {
-			{
-				"<leader>a",
-				function()
-					require("harpoon"):list():add()
-				end,
-				desc = "Add a file to Harpoon Two",
-			},
-			{
-				"<C-a>",
-				function()
-					local harpoon = require("harpoon")
-					harpoon.ui:toggle_quick_menu(harpoon:list())
-				end,
-				desc = "Open Harpoon Two quick menu",
-			},
-			{
-				"<leader>1",
-				function()
-					require("harpoon"):list():select(1)
-				end,
-				desc = "Switch to file 1",
-			},
-			{
-				"<leader>2",
-				function()
-					require("harpoon"):list():select(2)
-				end,
-				desc = "Switch to file 2",
-			},
-			{
-				"<leader>3",
-				function()
-					require("harpoon"):list():select(3)
-				end,
-				desc = "Switch to file 3",
-			},
-			{
-				"<leader>4",
-				function()
-					require("harpoon"):list():select(4)
-				end,
-				desc = "Switch to file 4",
-			},
-			{
-				"<leader>5",
-				function()
-					require("harpoon"):list():select(5)
-				end,
-				desc = "Switch to file 5",
-			},
-		},
-	},
-
-	{
-		"puremourning/vimspector",
-	},
-
-	{
-		"VidocqH/data-viewer.nvim",
-		opts = {},
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
-	},
-
-	{
 		"chrisgrieser/nvim-recorder",
 		dependencies = "rcarriga/nvim-notify",
 		opts = {},
@@ -560,32 +332,9 @@ require("lazy").setup({
 	},
 
 	{
-		"soulis-1256/eagle.nvim"
-	},
-
-	{
-		"pluffie/neoproj",
-		cmd = { "ProjectOpen", "ProjectNew" },
-	},
-
-	{
-		"ThePrimeagen/vim-be-good"
-	},
-
-	{
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
 		config = true,
-	},
-
-	{
-		"andymass/vim-matchup",
-		opts = {}
-	},
-
-	{
-		"monkoose/matchparen.nvim",
-		opts = {}
 	},
 
 	{
@@ -593,32 +342,25 @@ require("lazy").setup({
 	},
 
 	{
-		"norcalli/nvim-colorizer.lua",
-		opts = {},
-	},
-
-	{
-		"tpope/vim-abolish"
-	},
-
-	{
-		"joerdav/templ.vim"
-	},
-
-	{
-		"jasonwoodland/vim-html-indent"
-	},
-
-	{
-		"rktjmp/lush.nvim"
+		"mg979/vim-visual-multi",
+		init = function()
+			vim.g.VM_default_mappings = 0
+			vim.g.VM_maps = {
+				["Add Cursor Up"] = "<C-S-Up>",
+				["Add Cursor Down"] = "<C-S-Down>"
+			}
+		end,
 	}
-})
+}
 
-require("neoproj").setup({
-	project_path = "/mnt/d/programming",
-})
+if vim.fn.has('macunix') == 1 then
+	table.insert(plugins, {
+		"williamboman/mason.nvim",
+		opts = {}
+	})
+end
 
-require("eagle").setup({})
+require("lazy").setup(plugins)
 
 vim.o.mousemoveevent = true
 
@@ -635,18 +377,6 @@ vim.api.nvim_input("<Esc>")
 -- LSPs
 require 'lspconfig'.zls.setup {}
 require 'lspconfig'.gopls.setup {}
-require 'lspconfig'.clangd.setup {}
-require 'lspconfig'.ols.setup {}
-require 'neodev'.setup({
-	override = function(root_dir, library)
-		if root_dir:find("home/sterence/.config/nvim", 1, true) == 1 then
-			library.enabled = true
-			library.plugins = true
-			library.types = true
-			library.runtime = true
-		end
-	end,
-})
 require 'lspconfig'.lua_ls.setup {
 	settings = {
 		lua = {
@@ -660,18 +390,19 @@ require 'lspconfig'.tsserver.setup {}
 require 'lspconfig'.eslint.setup {}
 require 'lspconfig'.html.setup {}
 require 'lspconfig'.htmx.setup {}
-require 'lspconfig'.csharp_ls.setup {
-	lsp = {
-		format_on_save = false,
-	}
-}
 require 'lspconfig'.glslls.setup {
 	cmd = { "glslls", "--stdin", "--target-env=opengl4.5" }
 }
+require 'lspconfig'.omnisharp.setup {
+	cmd = { "omnisharp" },
+}
+require 'lspconfig'.ols.setup {
+	cmd = { "ols", "-enable_format", false },
+	filetypes = { "odin" },
+}
 
+-- Enable/Disable LSP
 vim.diagnostic.enable(false, nil)
-
-require 'colorizer'.setup {}
 
 vim.treesitter.language.register("glsl", "vert")
 vim.treesitter.language.register("glsl", "tesc")
@@ -696,3 +427,18 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 vim.filetype.add({ extension = { templ = "templ" } })
+
+if vim.fn.has('macunix') == 1 then
+	require 'lspconfig'.phpactor.setup {}
+	require 'lspconfig'.ts_ls.setup {} -- npm install -g typescript typescript-language-server
+end
+
+vim.api.nvim_create_autocmd("Filetype", {
+	pattern = { "*" },
+	callback = function()
+		vim.opt_local.formatoptions:remove("r")
+		vim.opt.formatoptions = vim.opt.formatoptions + {
+			o = false,
+		}
+	end
+})

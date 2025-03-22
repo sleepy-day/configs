@@ -1,5 +1,8 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
+export XDG_CONFIG_HOME="$HOME/.config"
+
+export PATH=$HOME/programs:$PATH
 export PATH=$HOME/Odin:$PATH
 export PATH=$HOME/miniconda3/bin:$PATH
 export PATH=$HOME/zig:$PATH
@@ -9,8 +12,25 @@ export PATH=$HOME/.cargo/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 export PATH=$HOME/ww2ogg/ww2ogg:$PATH
 export PATH=$HOME/.dotnet/tools:$PATH
+export PATH=$HOME/omnisharp:$PATH
+export PATH=$HOME/PSn00bSDK/PSn00bSDK-0.24-Linux/bin:$PATH
+export PATH=$HOME/Software/Grayjay:$PATH
+
+export VCPKG_ROOT=/opt/vcpkg
+export CMAKE_MAKE_PROGRAM=/usr/bin/make
+export CMAKE_CXX_COMPILER=/usr/bin/gcc
+
+export FREETYPE_PROPERTIES="cff:no-stem-darkening=0 autofitter:no-stem-darkening=0 $FREETYPE_PROPERTIES"
+
+export PATH=/mnt/c/HSR:$PATH
+
+export PSN00BSDK_LIBS=$HOME/PSn00bSDK/PSn00bSDK-0.24-Linux/lib/libpsn00b
+
 export MAKEFLAGS="-j14"
+
 source ~/.bash_profile
+
+alias mipsel-linux-gnu-gcc="mipsel-elf-gcc"
 
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
@@ -146,3 +166,5 @@ export PATH="$PATH:/home/sterence/.local/bin"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+export TERM=xterm
+source /usr/share/nvm/init-nvm.sh
