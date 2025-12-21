@@ -25,6 +25,11 @@ vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.bo.softtabstop = 2
 vim.opt.smartindent = false
+vim.opt.autoindent = false
+vim.opt.cindent = false
+vim.opt.cinoptions = "JN"
+vim.opt.foldmethod = "marker"
+vim.opt.foldmarker = "{,}"
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
@@ -41,12 +46,11 @@ vim.keymap.set("i", "<F1>", "<C-\\><C-n>:FloatermToggle primary<CR>")
 vim.keymap.set("n", "<F2>", "<Esc><Esc>:FloatermToggle git<CR>")
 vim.keymap.set("t", "<F2>", "<C-\\><C-n>:FloatermToggle git<CR>", { desc = "Exit terminal mode" })
 vim.keymap.set("i", "<F2>", "<C-\\><C-n>:FloatermToggle git<CR>", { desc = "Exit terminal mode" })
+vim.keymap.set("x", "ac", "ar^[\\s\\w]+ [\\w\\d_]+;$<CR>")
 
 vim.keymap.set("n", "o", "ox<BS>", { silent = true, noremap = true })
 vim.keymap.set("n", "O", "Ox<BS>", { silent = true, noremap = true })
-vim.keymap.set("i", "<CR>", "<CR>x")
 
-vim.keymap.set("n", "<leader>g", "<Esc><Esc>:FloatermToggle git<CR>", { desc = "Toggle lazygit terminal" })
 vim.keymap.set("n", "<leader>v", "<Esc><Esc>:FloatermToggle term<CR>", { desc = "Toggle general terminal" })
 
 vim.keymap.set("n", "<leader>left", "<C-w><C-h>", { desc = "Move focus to the left window" })
@@ -185,82 +189,12 @@ plugins = {
 	},
 
 	{
-		"neovim/nvim-lspconfig",
-		config = function()
-			vim.api.nvim_create_autocmd("LspAttach", {
-				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
-				callback = function(event)
-					local map = function(keys, func, desc)
-						vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
-					end
-
-					map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-
-					map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-
-					map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-
-					map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
-
-					map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-
-					map(
-						"<leader>ws",
-						require("telescope.builtin").lsp_dynamic_workspace_symbols,
-						"[W]orkspace [S]ymbols"
-					)
-
-					map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-
-					map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-
-					map("K", vim.lsp.buf.hover, "Hover Documentation")
-
-					map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-
-					local client = vim.lsp.get_client_by_id(event.data.client_id)
-				end,
-			})
-
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			-- capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-			local servers = {
-				gopls = {},
-				lua_ls = {
-					settings = {
-						Lua = {
-							completion = {
-								callSnippet = "Replace",
-							},
-							diagnostics = {
-								globals = { "vim" },
-							},
-						},
-					},
-				},
-				tsserver = {},
-				eslint = {},
-			}
-
-			local ensure_installed = vim.tbl_keys(servers or {})
-			vim.list_extend(ensure_installed, {
-				"stylua",
-			})
-		end,
-	},
-
-	{
-		"catppuccin/nvim",
-		name = "catppuccin",
-		priority = 1000,
+    "dgox16/oldworld.nvim",
+    lazy = false,
+    priority = 1000,
 		init = function()
-			require("catppuccin").setup({
-				flavour = "frappe",
-			})
-			vim.cmd.colorscheme("catppuccin")
-			vim.cmd.hi("Comment gui=none")
-		end,
+			vim.cmd.colorscheme("oldworld")
+		end
 	},
 
 	{
@@ -269,7 +203,8 @@ plugins = {
 		config = function()
 			local leap = require("leap")
 			leap.setup({})
-			leap.create_default_mappings()
+			vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
+			vim.keymap.set('n',             'S', '<Plug>(leap-from-window)')
 		end,
 	},
 
@@ -281,25 +216,24 @@ plugins = {
 		opts = { signs = false },
 	},
 
-	{ -- Highlight, edit, and navigate code
+	{ 
 		"nvim-treesitter/nvim-treesitter",
+		branch = "master",
 		build = ":TSUpdate",
 		opts = {
 			ensure_installed = {
 				"bash",
 				"c",
-				"html",
 				"lua",
 				"luadoc",
 				"markdown",
 				"vim",
 				"vimdoc",
-				"odin",
 				"go",
-				"zig",
 				"cpp",
+				"d",
 			},
-			auto_install = true,
+			auto_install = false,
 			highlight = {
 				enable = true,
 				additional_vim_regex_highlighting = false,
@@ -309,7 +243,7 @@ plugins = {
 				highlight_current_scope = false,
 				smart_rename = false,
 			},
-			indent = { enable = true, disable = { "ruby" } },
+			indent = { enable = true, },
 			matchup = {
 				enable = true,
 			},
@@ -336,6 +270,7 @@ plugins = {
 		event = "InsertEnter",
 		config = true,
 	},
+	
 
 	{
 		"mbbill/undotree"
@@ -350,7 +285,112 @@ plugins = {
 				["Add Cursor Down"] = "<C-S-Down>"
 			}
 		end,
-	}
+	},
+
+	{
+		"Vonr/align.nvim",
+		init = function() 
+			local NS = { noremap = true, silent = true }
+
+			-- Aligns to 1 character
+			vim.keymap.set(
+					'x',
+					'aa',
+					function()
+							require'align'.align_to_char({
+									length = 1,
+							})
+					end,
+					NS
+			)
+
+			-- Aligns to 2 characters with previews
+			vim.keymap.set(
+					'x',
+					'ad',
+					function()
+							require'align'.align_to_char({
+									preview = true,
+									length = 2,
+							})
+					end,
+					NS
+			)
+
+			-- Aligns to a string with previews
+			vim.keymap.set(
+					'x',
+					'aw',
+					function()
+							require'align'.align_to_string({
+									preview = true,
+									regex = false,
+							})
+					end,
+					NS
+			)
+
+			-- Aligns to a Vim regex with previews
+			vim.keymap.set(
+					'x',
+					'ar',
+					function()
+							require'align'.align_to_string({
+									preview = true,
+									regex = true,
+							})
+					end,
+					NS
+			)
+
+			-- Example gawip to align a paragraph to a string with previews
+			vim.keymap.set(
+					'n',
+					'gaw',
+					function()
+							local a = require'align'
+							a.operator(
+									a.align_to_string,
+									{
+											regex = false,
+											preview = true,
+									}
+							)
+    end,
+    NS
+)
+
+-- Example gaaip to align a paragraph to 1 character
+vim.keymap.set(
+    'n',
+    'gaa',
+    function()
+        local a = require'align'
+        a.operator(a.align_to_char)
+    end,
+    NS
+)
+		end
+	},
+
+	{
+		"nvim-pack/nvim-spectre",
+		init = function()
+			vim.keymap.set('n', '<leader>S', '<cmd>lua require("spectre").toggle()<CR>', {
+					desc = "Toggle Spectre"
+			})
+			vim.keymap.set('n', '<leader>sw', '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', {
+					desc = "Search current word"
+			})
+			vim.keymap.set('v', '<leader>sw', '<esc><cmd>lua require("spectre").open_visual()<CR>', {
+					desc = "Search current word"
+			})
+			vim.keymap.set('n', '<leader>sp', '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>', {
+					desc = "Search on current file"
+			})
+		end
+	},
+
 }
 
 if vim.fn.has('macunix') == 1 then
@@ -373,33 +413,6 @@ vim.cmd(":FloatermNew --name=term --cwd=<buffer-root>")
 vim.cmd(":FloatermToggle term")
 vim.api.nvim_input("<Esc>")
 vim.api.nvim_input("<Esc>")
-
--- LSPs
-require 'lspconfig'.zls.setup {}
-require 'lspconfig'.gopls.setup {}
-require 'lspconfig'.lua_ls.setup {
-	settings = {
-		lua = {
-			completion = {
-				callSnippet = "Replace"
-			}
-		}
-	}
-}
-require 'lspconfig'.tsserver.setup {}
-require 'lspconfig'.eslint.setup {}
-require 'lspconfig'.html.setup {}
-require 'lspconfig'.htmx.setup {}
-require 'lspconfig'.glslls.setup {
-	cmd = { "glslls", "--stdin", "--target-env=opengl4.5" }
-}
-require 'lspconfig'.omnisharp.setup {
-	cmd = { "omnisharp" },
-}
-require 'lspconfig'.ols.setup {
-	cmd = { "ols", "-enable_format", false },
-	filetypes = { "odin" },
-}
 
 -- Enable/Disable LSP
 vim.diagnostic.enable(false, nil)
@@ -427,11 +440,14 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 vim.filetype.add({ extension = { templ = "templ" } })
+vim.filetype.add({ extension = { layout = "glsl" } })
 
 if vim.fn.has('macunix') == 1 then
 	require 'lspconfig'.phpactor.setup {}
 	require 'lspconfig'.ts_ls.setup {} -- npm install -g typescript typescript-language-server
 end
+
+
 
 vim.api.nvim_create_autocmd("Filetype", {
 	pattern = { "*" },
@@ -442,3 +458,4 @@ vim.api.nvim_create_autocmd("Filetype", {
 		}
 	end
 })
+

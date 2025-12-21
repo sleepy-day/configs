@@ -192,14 +192,14 @@ bindsym $mod+Ctrl+Shift+8 move container to workspace number $ws18
 bindsym $mod+Ctrl+Shift+9 move container to workspace number $ws19
 bindsym $mod+Ctrl+Shift+0 move container to workspace number $ws20
 
-workspace $ws1 output DisplayPort-0
-workspace $ws2 output DisplayPort-0
-workspace $ws3 output DisplayPort-0
-workspace $ws11 output DisplayPort-0
-workspace $ws12 output DisplayPort-0
-workspace $ws13 output DisplayPort-0
-workspace $ws17 output DisplayPort-0
-workspace $ws18 output DisplayPort-0
+workspace $ws1 output DisplayPort-1
+workspace $ws2 output DisplayPort-1
+workspace $ws3 output DisplayPort-1
+workspace $ws11 output DisplayPort-1
+workspace $ws12 output DisplayPort-1
+workspace $ws13 output DisplayPort-1
+workspace $ws17 output DisplayPort-1
+workspace $ws18 output DisplayPort-1
 workspace $ws4 output DisplayPort-2
 workspace $ws5 output DisplayPort-2
 workspace $ws6 output DisplayPort-2
@@ -255,12 +255,12 @@ client.background       #ffffff
 
 bindsym $mod+r mode "resize"
 
-gaps inner 15px
-gaps outer 15px
+gaps inner 0px
+gaps outer 0px
 
 exec ~/.screenlayout/layout.sh
 
-default_border pixel 3
+default_border pixel 0
 default_floating_border pixel 1
 
 for_window [class="Video Game"] floating enable
@@ -273,7 +273,7 @@ exec --no-startup-id "i3-msg '--no-auto-back-and-forth 7; append_layout ~/.confi
 exec --no-startup-id "i3-msg '--no-auto-back-and-forth 11; append_layout ~/.config/i3/workspace_11.json'"
 exec --no-startup-id "i3-msg '--no-auto-back-and-forth 12; append_layout ~/.config/i3/workspace_12.json'"
 
-exec xrandr --output DisplayPort-2 --left-of DisplayPort-0 --set TearFree on
+exec xrandr --output DisplayPort-2 --left-of DisplayPort-1 --set TearFree on
 exec xrandr --output HDMI-A-0 --mode 2560x1440 --left-of DisplayPort-2 --set TearFree on
 exec feh --bg-scale ~/niyerniyer.jpeg ~/niyerniyer.jpeg ~/niyerniyer.jpeg
 exec discord

@@ -15,6 +15,7 @@ export PATH=$HOME/.dotnet/tools:$PATH
 export PATH=$HOME/omnisharp:$PATH
 export PATH=$HOME/PSn00bSDK/PSn00bSDK-0.24-Linux/bin:$PATH
 export PATH=$HOME/Software/Grayjay:$PATH
+export PATH=$HOME/4coder:$PATH
 
 export VCPKG_ROOT=/opt/vcpkg
 export CMAKE_MAKE_PROGRAM=/usr/bin/make
@@ -26,7 +27,9 @@ export PATH=/mnt/c/HSR:$PATH
 
 export PSN00BSDK_LIBS=$HOME/PSn00bSDK/PSn00bSDK-0.24-Linux/lib/libpsn00b
 
-export MAKEFLAGS="-j14"
+export MAKEFLAGS="-j8"
+
+export PROTON_USE_NTSYNC=1
 
 source ~/.bash_profile
 
@@ -134,7 +137,6 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-. /opt/asdf-vm/asdf.sh
 autoload -Uz compinit
 compinit
 
