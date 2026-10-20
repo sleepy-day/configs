@@ -16,6 +16,8 @@ export PATH=$HOME/omnisharp:$PATH
 export PATH=$HOME/PSn00bSDK/PSn00bSDK-0.24-Linux/bin:$PATH
 export PATH=$HOME/Software/Grayjay:$PATH
 export PATH=$HOME/4coder:$PATH
+export PATH=$HOME/fred:$PATH
+export PATH=$HOME/ark-vcs:$PATH
 
 export VCPKG_ROOT=/opt/vcpkg
 export CMAKE_MAKE_PROGRAM=/usr/bin/make
@@ -32,6 +34,7 @@ export MAKEFLAGS="-j8"
 export PROTON_USE_NTSYNC=1
 
 source ~/.bash_profile
+source ~/dlang/dmd-2.114.0-beta.1/activate 
 
 alias mipsel-linux-gnu-gcc="mipsel-elf-gcc"
 

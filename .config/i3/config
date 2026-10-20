@@ -65,7 +65,7 @@ bindsym $mod+d exec --no-startup-id dmenu_run
 # .desktop file. It is a wrapper around dmenu, so you need that installed.
 # bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
 
-bindsym Print exec flameshot gui
+bindsym Print exec maim -s | xclip -selection clipboard -t image/png
 bindsym $mod+Print exec --no-startup-id maim -i $(xdotool getactivewindow) | xclip -selection clipboard -t image/png
 
 bindsym $mod+Ctrl+F11 exec ~/scripts/workmode.sh
@@ -282,11 +282,11 @@ exec steam
 
 exec ~/scripts/sync-projects.sh
 
-assign [class="steam"] 6
+#assign [class="steam"] 6
 assign [class="discord"] 5
 assign [class="Element"] 7
 
-no_focus [class="steam"]
+#no_focus [class="steam"]
 no_focus [class="Element"]
 no_focus [class="discord"]
 

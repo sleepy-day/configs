@@ -1,35 +1,45 @@
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-vim.g.have_nerd_font = false
-vim.g.loaded_matchparen = 1
+vim.g.mapleader                 = " "
+vim.g.maplocalleader            = " "
+vim.g.have_nerd_font            = false
+vim.g.loaded_matchparen         = 1
 vim.g.OmniSharp_server_use_net6 = 1
-vim.g.OmniSharp_highlighting = 0
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.showmode = false
-vim.opt.clipboard = "unnamedplus"
-vim.opt.breakindent = true
-vim.opt.undofile = true
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-vim.opt.signcolumn = "yes"
-vim.opt.updatetime = 200
-vim.opt.timeoutlen = 300
-vim.opt.splitright = true
-vim.opt.splitbelow = true
-vim.opt.inccommand = "split"
-vim.opt.cursorline = true
-vim.opt.scrolloff = 4
-vim.opt.hlsearch = true
-vim.opt.tabstop = 2
-vim.opt.shiftwidth = 2
-vim.bo.softtabstop = 2
-vim.opt.smartindent = false
-vim.opt.autoindent = false
-vim.opt.cindent = false
-vim.opt.cinoptions = "JN"
-vim.opt.foldmethod = "marker"
-vim.opt.foldmarker = "{,}"
+vim.g.OmniSharp_highlighting    = 0
+vim.opt.number                  = true
+vim.opt.relativenumber          = true
+vim.opt.showmode                = false
+vim.opt.clipboard               = "unnamedplus"
+vim.opt.breakindent             = true
+vim.opt.undofile                = true
+vim.opt.ignorecase              = true
+vim.opt.smartcase               = true
+vim.opt.signcolumn              = "yes"
+vim.opt.updatetime              = 200
+vim.opt.timeoutlen              = 300
+vim.opt.splitright              = true
+vim.opt.splitbelow              = true
+vim.opt.inccommand              = "split"
+vim.opt.cursorline              = true
+vim.opt.scrolloff               = 4
+vim.opt.hlsearch                = true
+vim.opt.tabstop                 = 2
+vim.opt.shiftwidth              = 2
+vim.bo.softtabstop              = 2
+vim.opt.foldmethod              = "marker"
+vim.opt.foldmarker              = "{,}"
+vim.g.html_indent_style1        = "inc"
+
+-- Indents
+vim.opt.smartindent             = false
+vim.opt.autoindent              = true
+vim.opt.cindent                 = true
+vim.opt.cinkeys                 = "0{,0},0),0],0#,!^F,o,O,e"
+vim.opt.cinoptions              = "" -- "{s,}0,(s,)0,[s,]0" 
+vim.opt.indentexpr=""
+
+vim.cmd([[
+	filetype plugin on
+	filetype indent off
+]])
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
@@ -46,6 +56,13 @@ vim.keymap.set("i", "<F1>", "<C-\\><C-n>:FloatermToggle primary<CR>")
 vim.keymap.set("n", "<F2>", "<Esc><Esc>:FloatermToggle git<CR>")
 vim.keymap.set("t", "<F2>", "<C-\\><C-n>:FloatermToggle git<CR>", { desc = "Exit terminal mode" })
 vim.keymap.set("i", "<F2>", "<C-\\><C-n>:FloatermToggle git<CR>", { desc = "Exit terminal mode" })
+vim.keymap.set("n", "<F3>", "<Esc><Esc>:FloatermToggle terminal-2<CR>")
+vim.keymap.set("t", "<F3>", "<C-\\><C-n>:FloatermToggle terminal-2<CR>")
+vim.keymap.set("i", "<F3>", "<C-\\><C-n>:FloatermToggle terminal-2<CR>")
+vim.keymap.set("n", "<F4>", "<Esc><Esc>:FloatermToggle terminal-3<CR>")
+vim.keymap.set("t", "<F4>", "<C-\\><C-n>:FloatermToggle terminal-3<CR>")
+vim.keymap.set("i", "<F4>", "<C-\\><C-n>:FloatermToggle terminal-3<CR>")
+
 vim.keymap.set("x", "ac", "ar^[\\s\\w]+ [\\w\\d_]+;$<CR>")
 
 vim.keymap.set("n", "o", "ox<BS>", { silent = true, noremap = true })
@@ -198,7 +215,7 @@ plugins = {
 	},
 
 	{
-		"ggandor/leap.nvim",
+		url = "https://codeberg.org/andyg/leap.nvim",
 		name = "leap",
 		config = function()
 			local leap = require("leap")
@@ -214,45 +231,6 @@ plugins = {
 		event = "VimEnter",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		opts = { signs = false },
-	},
-
-	{ 
-		"nvim-treesitter/nvim-treesitter",
-		branch = "master",
-		build = ":TSUpdate",
-		opts = {
-			ensure_installed = {
-				"bash",
-				"c",
-				"lua",
-				"luadoc",
-				"markdown",
-				"vim",
-				"vimdoc",
-				"go",
-				"cpp",
-				"d",
-			},
-			auto_install = false,
-			highlight = {
-				enable = true,
-				additional_vim_regex_highlighting = false,
-			},
-			refactor = {
-				highlight_definitions = false,
-				highlight_current_scope = false,
-				smart_rename = false,
-			},
-			indent = { enable = true, },
-			matchup = {
-				enable = true,
-			},
-		},
-		config = function(_, opts)
-			require("nvim-treesitter.install").prefer_git = true
-			---@diagnostic disable-next-line: missing-fields
-			require("nvim-treesitter.configs").setup(opts)
-		end,
 	},
 
 	{
@@ -285,6 +263,10 @@ plugins = {
 				["Add Cursor Down"] = "<C-S-Down>"
 			}
 		end,
+	},
+
+	{
+		"rluba/jai.vim"
 	},
 
 	{
@@ -391,6 +373,19 @@ vim.keymap.set(
 		end
 	},
 
+	{
+		"romus204/tree-sitter-manager.nvim",
+		dependencies = {}, -- tree-sitter CLI must be installed system-wide
+		config = function()
+			require("tree-sitter-manager").setup({
+				query_dir = "~/.local/share/nvim/",
+				ensure_installed = { "bash", "odin", "d", "c", "cpp", "glsl", "html", "javascript", "go", "typescript", "ecma" }, -- list of parsers to install automatically
+				-- Optional: custom paths
+				-- parser_dir = vim.fn.stdpath("data") .. "/site/parser",
+				-- query_dir = vim.fn.stdpath("data") .. "/site/queries",
+			})
+		end
+	},
 }
 
 if vim.fn.has('macunix') == 1 then
