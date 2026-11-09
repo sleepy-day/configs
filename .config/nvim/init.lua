@@ -121,7 +121,7 @@ plugins = {
 	{
 		"nvim-telescope/telescope.nvim",
 		event = "VimEnter",
-		branch = "0.1.x",
+		branch = "master",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			{
@@ -153,6 +153,9 @@ plugins = {
 						"--smart-case",
 						"--auto-hybrid-regex"
 					},
+				},
+				preview = {
+					treesitter = false,
 				},
 				pickers = {
 					find_files = {
@@ -374,18 +377,37 @@ vim.keymap.set(
 	},
 
 	{
-		"romus204/tree-sitter-manager.nvim",
-		dependencies = {}, -- tree-sitter CLI must be installed system-wide
+		"nvim-treesitter/nvim-treesitter",
+		branch = "main",
+		lazy = false,
+		build = ":TSUpdate",
 		config = function()
-			require("tree-sitter-manager").setup({
-				query_dir = "~/.local/share/nvim/",
-				ensure_installed = { "bash", "odin", "d", "c", "cpp", "glsl", "html", "javascript", "go", "typescript", "ecma" }, -- list of parsers to install automatically
-				-- Optional: custom paths
-				-- parser_dir = vim.fn.stdpath("data") .. "/site/parser",
-				-- query_dir = vim.fn.stdpath("data") .. "/site/queries",
+			require("nvim-treesitter").setup()
+
+			require("nvim-treesitter").install({
+				"c",
+				"cpp",
+				"d",
+				"glsl",
+				"hlsl",
+				"slang",
+			})
+
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = {
+					"c",
+					"cpp",
+					"d",
+					"glsl",
+					"hlsl",
+					"slang",
+				},
+				callback = function()
+					vim.treesitter.start()
+				end,
 			})
 		end
-	},
+	}
 }
 
 if vim.fn.has('macunix') == 1 then
@@ -442,8 +464,6 @@ if vim.fn.has('macunix') == 1 then
 	require 'lspconfig'.ts_ls.setup {} -- npm install -g typescript typescript-language-server
 end
 
-
-
 vim.api.nvim_create_autocmd("Filetype", {
 	pattern = { "*" },
 	callback = function()
@@ -454,3 +474,4 @@ vim.api.nvim_create_autocmd("Filetype", {
 	end
 })
 
+vim.treesitter.stop()
